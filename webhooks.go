@@ -103,7 +103,12 @@ func (Embed DiscordEmbed) Send(webhookURL, message, username, avatarURL string) 
 	}
 	defer webhookPostResponse.Body.Close()
 	if webhookPostResponse.StatusCode != 204 {
-		return fmt.Errorf("invalid webhook response status code %d", webhookPostResponse.StatusCode)
+		webhookErrMsg, err := io.ReadAll(webhookPostResponse.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(string(webhookErrMsg))
+		
 	}
 	return nil
 }
